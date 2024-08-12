@@ -1,0 +1,17 @@
+*{
+  background-color: black;
+}
+#field{
+  width: 100%;
+}
+#field td{
+  width: 30px;
+  height: 30px;
+  background-color: grey;
+}
+#field table{
+  margin: 50px auto;
+}
+#field td.figureCell{
+  background-color: darkgreen;
+}
