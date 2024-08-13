@@ -1,4 +1,5 @@
 import { Coord } from "./Coord.interface";
+import Field from "./Field";
 
 export function drawField(width: number, height: number) {
     let table: string = `
@@ -17,6 +18,12 @@ export function drawField(width: number, height: number) {
 
       document.getElementById('field')!.innerHTML = table;
 }
+
+
+export function refreshField(fieldClass: Field){
+    const field: boolean[][] = fieldClass.getField();
+}
+
 
 export function drawFigure(figure: Coord[]) {
     figure.forEach((coord)=>{

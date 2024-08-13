@@ -20,8 +20,10 @@ export class Game {
         this.speed = globalParams.speed;
         this.field = new Field(globalParams.field.width, globalParams.field.height);
         drawField(globalParams.field.width, globalParams.field.height);
-    
-    
+        this.initKeyPresses();
+    }
+
+    initKeyPresses(){
         document.addEventListener('keydown', (e) =>{
             switch(e.code){
                 case 'ArrowLeft':
@@ -39,6 +41,7 @@ export class Game {
             }
         })
     }
+
 
 
     rotateFigure(figure: Coord[]){
@@ -106,6 +109,33 @@ export class Game {
 
     }
 
+    clearRowsIfNeeded(){
+        console.log(this.figure);
+        const uniqueFilter = (value: any, index: number, array: any[]) => array.indexOf(value) === index;
+        const rowsToCheck = this.figure.map((coord: Coord) => coord.y).filter(uniqueFilter);
+        const rowsToClear = this.field.getFullRows(rowsToCheck);
+        this.field.clearFullRows(rowsToClear);
+    }
+
+    
+
+
+    processDropFigure(intervalId: number){
+        this.reserveFigurePlace();
+        this.clearRowsIfNeeded();
+        this.createNewFigure();
+        if(this.hasLanded(this.figure)){
+            console.log('THE END');
+            clearInterval(intervalId);
+        }
+    }
+
+    reserveFigurePlace(){
+        this.figure.forEach((coord: Coord)=> this.field.setSquare(coord, true));
+    }
+
+    
+
     canFigureBePlaced(figure: Coord[]){
         return figure.every((coord: Coord) => this.field.canSquareBeOccupied(coord));
     }
@@ -118,18 +148,18 @@ export class Game {
         drawFigure(this.figure);
     }
 
+
+    
     start(){
-        this.createNewFigure()
-        // setInterval(() => {
-        //     console.log(this.hasLanded(this.figure));
+        this.createNewFigure();
+        const intervalId = setInterval(() => {
             
-        //     if(this.hasLanded(this.figure)){
-        //         console.log('landed');
-                
-        //     } else{
-        //         this.moveFigure(DIRECTION.DOWN);
-        //     }
-        // }, 1000)
+            if(this.hasLanded(this.figure)){
+                this.processDropFigure(intervalId);
+            } else{
+                this.moveFigure(DIRECTION.DOWN);
+            }
+        }, 1000)
     }
 
     shiftFigure(figure: Coord[], offsetX: number, offsetY: number): Coord[] {

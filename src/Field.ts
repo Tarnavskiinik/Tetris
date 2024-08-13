@@ -18,7 +18,26 @@ export default class Field {
         
     }
 
-    canSquareBeOccupied(coord: Coord): boolean {
-        return coord.x >= 0 && coord.x < this.width && coord.y < this.height;
+    getField(): boolean[][]{
+        return structuredClone(this.field);
     }
+
+    canSquareBeOccupied(coord: Coord): boolean {
+        return coord.x >= 0 && coord.x < this.width && coord.y < this.height && !this.field[coord.y][coord.x];
+    }
+
+    setSquare(square: Coord, value: boolean){
+        this.field[square.y][square.x] = value;
+    }
+
+
+    getFullRows(rowsToCheck: number[]): number[] {
+        return rowsToCheck.filter((row: number) => this.field[row].every((square: boolean) => square));
+    }
+
+    clearFullRows(rowNumbers: number[]){
+        this.field.splice(rowNumbers[0], 1);
+        this.field.unshift(new Array(this.width).fill(false));
+    }
+
 }
