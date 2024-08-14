@@ -1,5 +1,5 @@
 import { Coord } from "./Coord.interface";
-import { drawField, drawFigure, eraseFigure } from "./drawFunctions";
+import { Draw } from "./Draw";
 import Field from "./Field";
 import { getRandomTemplate } from "./figureTemplates";
 
@@ -11,15 +11,22 @@ enum DIRECTION {
 }
 
 export class Game {
+    private draw: Draw;
+    private miniField: Field;
     private field: Field;
+    private nextFigure: Coord[];
     private figure: Coord[];
     private speed: number;
 
     constructor(globalParams: any){
+        this.draw = new Draw(globalParams.fieldContainerId, globalParams.miniFieldContainerId);
+        this.nextFigure = [];
         this.figure = [];
         this.speed = globalParams.speed;
-        this.field = new Field(globalParams.field.width, globalParams.field.height);
-        drawField(globalParams.field.width, globalParams.field.height);
+        this.miniField = new Field(4, 4, globalParams.miniFieldContainerId);
+        this.field = new Field(globalParams.field.width, globalParams.field.height, globalParams.fieldContainerId);
+        this.draw.drawField(this.field);
+        this.draw.drawField(this.miniField);
         this.initKeyPresses();
     }
 
@@ -74,8 +81,8 @@ export class Game {
 
         if(this.canFigureBePlaced(rotatedFigure)){
             this.figure = rotatedFigure;
-            eraseFigure(figure);
-            drawFigure(this.figure);
+            this.draw.eraseFigure(figure);
+            this.draw.drawFigure(this.figure);
         }
     }
 
@@ -102,19 +109,21 @@ export class Game {
         figure = this.shiftFigure(figure, x, y);
         
         if(this.canFigureBePlaced(figure)){
-            eraseFigure(this.figure);
+            this.draw.eraseFigure(this.figure);
             this.figure = this.shiftFigure(this.figure, x, y);
-            drawFigure(this.figure);
+            this.draw.drawFigure(this.figure);
         }
 
     }
 
     clearRowsIfNeeded(){
-        console.log(this.figure);
         const uniqueFilter = (value: any, index: number, array: any[]) => array.indexOf(value) === index;
         const rowsToCheck = this.figure.map((coord: Coord) => coord.y).filter(uniqueFilter);
         const rowsToClear = this.field.getFullRows(rowsToCheck);
-        this.field.clearFullRows(rowsToClear);
+        if(rowsToClear.length){
+            this.field.clearFullRows(rowsToClear);
+            this.draw.drawField(this.field);
+        }
     }
 
     
@@ -141,11 +150,16 @@ export class Game {
     }
 
 
+    createNextFigure(){
+        this.nextFigure = getRandomTemplate();
+        this.draw.drawFigure(this.figure);
+    }
+
     createNewFigure(){
         const offsetX = Math.floor((this.field.width - 4) / 2);
         
         this.figure = this.shiftFigure(getRandomTemplate(), offsetX, 0);
-        drawFigure(this.figure);
+        this.draw.drawFigure(this.figure);
     }
 
 

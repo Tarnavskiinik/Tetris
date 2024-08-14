@@ -1,17 +1,20 @@
 *{
   background-color: black;
 }
-#field{
+.game-container{
+  display: flex;
+  justify-content: center;
+  gap: 50px;
   width: 100%;
 }
-#field td{
+#field td, #mini-field td{
   width: 30px;
   height: 30px;
   background-color: grey;
 }
-#field table{
+#field table, #mini-field table{
   margin: 50px auto;
 }
-#field td.figureCell{
+#field td.figureCell, #mini-field td.figureCell{
   background-color: darkgreen;
 }

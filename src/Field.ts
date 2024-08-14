@@ -2,14 +2,15 @@ import { Coord } from "./Coord.interface";
 
 export default class Field {
     private field: boolean[][];
+    public readonly containerId: string;
     public readonly width: number;
     public readonly height: number;
-
     
-    constructor(width: number, height: number){
+    
+    constructor(width: number, height: number, containerId: string){
         this.width = width;
         this.height = height;
-
+        this.containerId = containerId;
         
         this.field = new Array(height).fill(false);
         this.field.forEach((value, index)=>{
@@ -18,6 +19,8 @@ export default class Field {
         
     }
 
+
+    
     getField(): boolean[][]{
         return structuredClone(this.field);
     }
@@ -36,8 +39,9 @@ export default class Field {
     }
 
     clearFullRows(rowNumbers: number[]){
-        this.field.splice(rowNumbers[0], 1);
-        this.field.unshift(new Array(this.width).fill(false));
+        rowNumbers.forEach((rowNumber: number) => {
+            this.field.splice(rowNumber, 1);
+            this.field.unshift(new Array(this.width).fill(false));
+        })
     }
-
 }

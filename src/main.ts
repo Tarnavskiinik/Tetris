@@ -1,8 +1,4 @@
 import './style.css';
-import { drawField, drawFigure } from './drawFunctions';
-import Field from './Field';
-import { getRandomTemplate } from './figureTemplates';
-import { Coord } from './Coord.interface';
 import { Game } from './Game';
 
 
@@ -11,6 +7,8 @@ const globalParams = {
     width: 10,
     height: 25
   },
+  fieldContainerId: 'field',
+  miniFieldContainerId: 'mini-field',
   speed: 1
 };
 
