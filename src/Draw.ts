@@ -34,6 +34,7 @@ export class Draw {
     }
     
     drawFigure(figure: Coord[], isMiniContainer?: boolean) {
+        // Рисуем Фигуру
         const containerName: string = isMiniContainer ? this.miniFieldId : this.fieldId;
 
         figure.forEach((coord)=>{
@@ -46,6 +47,7 @@ export class Draw {
     }
 
     eraseFigure(figure: Coord[], isMiniContainer?: boolean) {
+        // Стираем фигуру
         const containerName: string = isMiniContainer ? this.miniFieldId : this.fieldId;
 
         figure.forEach((coord) => {

@@ -19,6 +19,7 @@ export class Game {
     private speed: number;
 
     constructor(globalParams: any){
+        // Инициализация игры с основными параметрами.
         this.draw = new Draw(globalParams.fieldContainerId, globalParams.miniFieldContainerId);
         this.nextFigure = [];
         this.figure = [];
@@ -31,6 +32,7 @@ export class Game {
     }
 
     initKeyPresses(){
+        // Инициализация обработчиков нажатий клавиш для управления фигурой.
         document.addEventListener('keydown', (e) =>{
             switch(e.code){
                 case 'ArrowLeft':
@@ -52,6 +54,7 @@ export class Game {
 
 
     rotateFigure(figure: Coord[]){
+        // Поворот фигуры на 90 градусов.
         // search distance to left top field corner
         let fieldX = Math.min(...(figure.map((coord: Coord) => coord.x)));
         const fieldY = Math.min(...(figure.map((coord: Coord) => coord.y)));
@@ -88,12 +91,14 @@ export class Game {
 
 
     hasLanded(figure: Coord[]): boolean {
+        // Проверка, коснулась ли фигура нижней границы или другой фигуры.
         return figure.some((coord: Coord) => !this.field.canSquareBeOccupied({x: coord.x, y: coord.y + 1}));
     }
 
 
 
     moveFigure(direction: DIRECTION){
+        // Перемещение фигуры влево, вправо или вниз.
         let x = 0;
         let y = 0;
 
@@ -117,6 +122,7 @@ export class Game {
     }
 
     clearRowsIfNeeded(){
+        // Очистка полных рядов, если такие имеются.
         const uniqueFilter = (value: any, index: number, array: any[]) => array.indexOf(value) === index;
         const rowsToCheck = this.figure.map((coord: Coord) => coord.y).filter(uniqueFilter);
         const rowsToClear = this.field.getFullRows(rowsToCheck);
@@ -130,9 +136,12 @@ export class Game {
 
 
     processDropFigure(intervalId: number){
+        // Обработка завершения падения фигуры.
         this.reserveFigurePlace();
         this.clearRowsIfNeeded();
-        this.createNewFigure();
+        this.createFigureInField(this.nextFigure);
+        this.createNextFigure();
+
         if(this.hasLanded(this.figure)){
             console.log('THE END');
             clearInterval(intervalId);
@@ -140,34 +149,47 @@ export class Game {
     }
 
     reserveFigurePlace(){
+        // Закрепление текущей фигуры на игровом поле.
         this.figure.forEach((coord: Coord)=> this.field.setSquare(coord, true));
     }
 
     
 
     canFigureBePlaced(figure: Coord[]){
+        // Проверка, может ли фигура быть размещена на текущей позиции.
         return figure.every((coord: Coord) => this.field.canSquareBeOccupied(coord));
     }
 
 
     createNextFigure(){
+        // Создание следующей фигуры.
+        let shiftedFigure = this.shiftFigure(this.nextFigure, 0, 1);
+        this.draw.eraseFigure(shiftedFigure, true);
+
         this.nextFigure = getRandomTemplate();
-        this.draw.drawFigure(this.figure);
+        shiftedFigure = this.shiftFigure(this.nextFigure, 0, 1);
+        this.draw.drawFigure(shiftedFigure, true);
     }
 
-    createNewFigure(){
+
+    createFigureInField(figure: Coord[]){
+        // Создание новой фигуры в центре верхней части поля.
         const offsetX = Math.floor((this.field.width - 4) / 2);
-        
-        this.figure = this.shiftFigure(getRandomTemplate(), offsetX, 0);
+        const figureClone = structuredClone(figure);
+
+        this.figure = this.shiftFigure(figureClone, offsetX, 0);
         this.draw.drawFigure(this.figure);
     }
 
 
     
     start(){
-        this.createNewFigure();
+        // Запуск игры.
+        this.createNextFigure();
+        const randomFigure = getRandomTemplate();
+        this.createFigureInField(randomFigure);
+
         const intervalId = setInterval(() => {
-            
             if(this.hasLanded(this.figure)){
                 this.processDropFigure(intervalId);
             } else{
