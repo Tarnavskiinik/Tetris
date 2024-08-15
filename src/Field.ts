@@ -1,7 +1,7 @@
 import { Coord } from "./Coord.interface";
 
 export default class Field {
-    private field: boolean[][];
+    private field: string[][];
     public readonly containerId: string;
     public readonly width: number;
     public readonly height: number;
@@ -12,16 +12,16 @@ export default class Field {
         this.height = height;
         this.containerId = containerId;
         
-        this.field = new Array(height).fill(false);
+        this.field = new Array(height).fill('');
         this.field.forEach((value, index)=>{
-            this.field[index] = new Array(width).fill(false);
+            this.field[index] = new Array(width).fill('');
         })
         
     }
 
 
     
-    getField(): boolean[][]{
+    getField(): string[][]{
          // Получение текущего состояния игрового поля.
         return structuredClone(this.field);
     }
@@ -31,7 +31,7 @@ export default class Field {
         return coord.x >= 0 && coord.x < this.width && coord.y < this.height && !this.field[coord.y][coord.x];
     }
 
-    setSquare(square: Coord, value: boolean){
+    setSquare(square: Coord, value: string){
          // Установка значения (занятости) клетки на игровом поле.
         this.field[square.y][square.x] = value;
     }
@@ -39,7 +39,7 @@ export default class Field {
 
     getFullRows(rowsToCheck: number[]): number[] {
         // Получение списка полных рядов, которые должны быть очищены.
-        return rowsToCheck.filter((row: number) => this.field[row].every((square: boolean) => square));
+        return rowsToCheck.filter((row: number) => this.field[row].every((square: string) => !!square));
     }
 
     clearFullRows(rowNumbers: number[]){

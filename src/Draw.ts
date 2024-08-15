@@ -1,5 +1,6 @@
 import { Coord } from "./Coord.interface";
 import Field from "./Field";
+import { Figure } from "./Figure";
 
 
 
@@ -14,7 +15,7 @@ export class Draw {
     }
 
     drawField(fieldInstance: Field) {
-        const field: boolean[][] = fieldInstance.getField();
+        const field: string[][] = fieldInstance.getField();
         const containerId: string = fieldInstance.containerId;
         let table: string = `
             <table>
@@ -22,9 +23,9 @@ export class Draw {
     
         field.forEach((row, y) => {
             table += '<tr>';
-            row.forEach((square, x) => {
-                let classText = square ? 'class="figureCell"' : '';
-                table += `<td ${classText} id="${containerId}-cell${x}-${y}"></td>`;
+            row.forEach((squareColor: string, x) => {
+                let styleText = squareColor ? `style="background-color: ${squareColor}"` : '';
+                table += `<td ${styleText} id="${containerId}-cell${x}-${y}"></td>`;
             });
             table += '</tr>';
         });
@@ -33,27 +34,27 @@ export class Draw {
           document.getElementById(containerId)!.innerHTML = table;
     }
     
-    drawFigure(figure: Coord[], isMiniContainer?: boolean) {
+    drawFigure(figure: Figure, isMiniContainer?: boolean) {
         // Рисуем Фигуру
         const containerName: string = isMiniContainer ? this.miniFieldId : this.fieldId;
 
-        figure.forEach((coord)=>{
+        figure.coords.forEach((coord)=>{
             const element = document.getElementById(`${containerName}-cell${coord.x}-${coord.y}`);
             if(element){
-                element.classList.add('figureCell');
+                element.style.backgroundColor = figure.color;
             }
         })
         
     }
 
-    eraseFigure(figure: Coord[], isMiniContainer?: boolean) {
+    eraseFigure(figure: Figure, isMiniContainer?: boolean) {
         // Стираем фигуру
         const containerName: string = isMiniContainer ? this.miniFieldId : this.fieldId;
 
-        figure.forEach((coord) => {
+        figure.coords.forEach((coord) => {
             const element =  document.getElementById(`${containerName}-cell${coord.x}-${coord.y}`);
             if(element){
-                element.classList.remove('figureCell');
+                element.style.backgroundColor = '';
             }
         });
     }

@@ -1,7 +1,6 @@
-export default class Figure{
-    private figure: boolean[][];
-    
-    constructor(template: boolean[][]){
-        this.figure = structuredClone(template);
-    }
+import { Coord } from "./Coord.interface";
+
+export interface Figure {
+    coords: Coord[],
+    color: string
 }
