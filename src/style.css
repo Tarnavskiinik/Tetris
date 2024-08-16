@@ -10,11 +10,27 @@
 #field td, #mini-field td{
   width: 30px;
   height: 30px;
-  background-color: grey;
+  background-color: #505050;
 }
 #field table, #mini-field table{
   margin: 50px auto;
 }
 #field td.figureCell, #mini-field td.figureCell{
   background-color: darkgreen;
+}
+
+#score{
+  position: absolute;
+  top: 30%;
+  left: 60%;
+  font-size: 50px;
+  color: white;
+}
+
+#highscore{
+  position: absolute;
+  top: 22%;
+  left: 60%;
+  font-size: 50px;
+  color: white;
 }

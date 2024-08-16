@@ -1,4 +1,3 @@
-import { Coord } from "./Coord.interface";
 import Field from "./Field";
 import { Figure } from "./Figure";
 
@@ -46,6 +45,21 @@ export class Draw {
         })
         
     }
+
+    drawScore(score: number){
+        const scoreElement = document.getElementById('score');
+        if (scoreElement) {
+            scoreElement.innerText = `Score: ${score}`;
+        }
+    }
+
+    drawHighScore(score: number){
+        const highscoreElement = document.getElementById('highscore');
+        if (highscoreElement) {
+            highscoreElement.innerText = `Highscore: ${score}`;
+        }
+    }
+
 
     eraseFigure(figure: Figure, isMiniContainer?: boolean) {
         // Стираем фигуру

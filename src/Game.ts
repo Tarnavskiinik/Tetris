@@ -11,6 +11,8 @@ enum DIRECTION {
     DOWN
 }
 
+const LOCALSTORAGE_HIGHSCORE_KEY = 'TetrisHighScore';
+
 export class Game {
     private draw: Draw;
     private miniField: Field;
@@ -18,6 +20,8 @@ export class Game {
     private nextFigure: Figure;
     private figure: Figure;
     private speed: number;
+    private score: number;
+    private highScore: number;
 
     constructor(globalParams: any){
         // Инициализация игры с основными параметрами.
@@ -27,6 +31,9 @@ export class Game {
         this.speed = globalParams.speed;
         this.miniField = new Field(4, 4, globalParams.miniFieldContainerId);
         this.field = new Field(globalParams.field.width, globalParams.field.height, globalParams.fieldContainerId);
+        this.score = 0;
+        this.highScore = 0;
+
         this.draw.drawField(this.field);
         this.draw.drawField(this.miniField);
         this.initKeyPresses();
@@ -96,6 +103,17 @@ export class Game {
     }
 
 
+    updateScore(lines: number){
+        const scoreByLines: number[] = [0, 10, 25, 40, 70];
+        this.score += scoreByLines[lines];
+        this.draw.drawScore(this.score);
+        
+        if(this.highScore < this.score){
+            this.highScore = this.score;
+            this.draw.drawHighScore(this.highScore);
+        }
+    }
+
     hasLanded(figure: Figure): boolean {
         // Проверка, коснулась ли фигура нижней границы или другой фигуры.
         return figure.coords.some((coord: Coord) => !this.field.canSquareBeOccupied({x: coord.x, y: coord.y + 1}));
@@ -135,6 +153,7 @@ export class Game {
         if(rowsToClear.length){
             this.field.clearFullRows(rowsToClear);
             this.draw.drawField(this.field);
+            this.updateScore(rowsToClear.length);
         }
     }
 
@@ -151,6 +170,7 @@ export class Game {
         if(this.hasLanded(this.figure)){
             console.log('THE END');
             clearInterval(intervalId);
+            localStorage.setItem(LOCALSTORAGE_HIGHSCORE_KEY, String(this.highScore));
         }
     }
 
@@ -190,7 +210,10 @@ export class Game {
 
     
     start(){
-        // Запуск игры.
+        // Запуск игры.  
+        this.highScore = Number(localStorage.getItem(LOCALSTORAGE_HIGHSCORE_KEY)) || 0;
+        this.draw.drawHighScore(this.highScore);
+        
         this.createNextFigure();
         const randomFigure = getRandomFigure();
         this.createFigureInField(randomFigure);
