@@ -2,7 +2,7 @@ import { Coord } from "./Coord.interface";
 import { Draw } from "./Draw";
 import Field from "./Field";
 import { Figure } from "./Figure";
-import { getRandomCoords, getRandomFigure } from "./figureTemplates";
+import { getRandomFigure } from "./figureTemplates";
 
 
 enum DIRECTION {
@@ -19,12 +19,16 @@ export class Game {
     private field: Field;
     private nextFigure: Figure;
     private figure: Figure;
+    private speedLevels : number[];
     private speed: number;
     private score: number;
     private highScore: number;
+    private isGameOver = false;
 
     constructor(globalParams: any){
         // Инициализация игры с основными параметрами.
+        this.speedLevels = [1000, 50, 600, 400, 200];
+        this.speed = this.speedLevels[0];
         this.draw = new Draw(globalParams.fieldContainerId, globalParams.miniFieldContainerId);
         this.nextFigure = {coords:[], color: ''};
         this.figure = {coords:[], color: ''};
@@ -33,6 +37,7 @@ export class Game {
         this.field = new Field(globalParams.field.width, globalParams.field.height, globalParams.fieldContainerId);
         this.score = 0;
         this.highScore = 0;
+        this.isGameOver = false;
 
         this.draw.drawField(this.field);
         this.draw.drawField(this.miniField);
@@ -158,7 +163,14 @@ export class Game {
     }
 
     
-
+    updateSpeedBasedOnScore() {
+        const scoreLevels = [0, 10, 200, 300, 400];
+        scoreLevels.forEach((level, index) => {
+            if (this.score >= level) {
+                this.speed = this.speedLevels[index];
+            }
+        });
+    }
 
     processDropFigure(intervalId: number){
         // Обработка завершения падения фигуры.
@@ -168,7 +180,8 @@ export class Game {
         this.createNextFigure();
 
         if(this.hasLanded(this.figure)){
-            console.log('THE END');
+            this.isGameOver = true;
+            alert('THE END');
             clearInterval(intervalId);
             localStorage.setItem(LOCALSTORAGE_HIGHSCORE_KEY, String(this.highScore));
         }
@@ -207,7 +220,21 @@ export class Game {
         this.draw.drawFigure(this.figure);
     }
 
-
+    runGameLoop() {
+        //Запуск игрового цикла
+        if (this.isGameOver) return;
+        this.updateSpeedBasedOnScore();
+        
+        const intervalId = setInterval(() => {
+            if (this.hasLanded(this.figure)) {
+                this.processDropFigure(intervalId);
+                clearInterval(intervalId);
+                this.runGameLoop();
+            } else {
+                this.moveFigure(DIRECTION.DOWN);
+            }
+        }, this.speed); 
+    }
     
     start(){
         // Запуск игры.  
@@ -218,13 +245,7 @@ export class Game {
         const randomFigure = getRandomFigure();
         this.createFigureInField(randomFigure);
 
-        const intervalId = setInterval(() => {
-            if(this.hasLanded(this.figure)){
-                this.processDropFigure(intervalId);
-            } else{
-                this.moveFigure(DIRECTION.DOWN);
-            }
-        }, 1000)
+        this.runGameLoop()
     }
 
     shiftFigure(figure: Figure, offsetX: number, offsetY: number): Figure {
